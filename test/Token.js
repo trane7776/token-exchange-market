@@ -3,10 +3,12 @@ const { ethers } = require('hardhat');
 const tokens = (n) => ethers.utils.parseUnits(n.toString(), 'ether');
 describe('Token', () => {
   let token;
+  let deployer;
   beforeEach(async () => {
     // Deploy the contract
+    [deployer] = await ethers.getSigners();
     const Token = await ethers.getContractFactory('Token');
-    token = await Token.deploy('Trane Coin', 'TRC', 1000000);
+    token = await Token.connect(deployer).deploy('Trane Coin', 'TRC', 1000000);
     await token.deployed();
   });
 
@@ -29,6 +31,9 @@ describe('Token', () => {
     });
     it('has a total supply of 1000000', async () => {
       expect(await token.totalSupply()).to.equal(tokens(1000000));
+    });
+    it('should assign the total supply to the owner', async () => {
+      expect(await token.balanceOf(deployer.address)).to.equal(totalSupply);
     });
   });
 
