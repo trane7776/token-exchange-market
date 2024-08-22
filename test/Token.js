@@ -3,10 +3,10 @@ const { ethers } = require('hardhat');
 const tokens = (n) => ethers.utils.parseUnits(n.toString(), 'ether');
 describe('Token', () => {
   let token;
-  let deployer, person1;
+  let deployer, receiver, exchange;
   beforeEach(async () => {
     // Deploy the contract
-    [deployer, person1] = await ethers.getSigners();
+    [deployer, receiver, exchange] = await ethers.getSigners();
     const Token = await ethers.getContractFactory('Token');
     token = await Token.connect(deployer).deploy('Trane Coin', 'TRC', 1000000);
     await token.deployed();
@@ -43,7 +43,7 @@ describe('Token', () => {
         amount = tokens(100);
         transaction = await token
           .connect(deployer)
-          .transfer(person1.address, amount);
+          .transfer(receiver.address, amount);
         result = await transaction.wait();
       });
 
@@ -51,14 +51,14 @@ describe('Token', () => {
         expect(await token.balanceOf(deployer.address)).to.equal(
           tokens(999900)
         );
-        expect(await token.balanceOf(person1.address)).to.equal(amount);
+        expect(await token.balanceOf(receiver.address)).to.equal(amount);
       });
       it('emits Transfer event', async () => {
         const eventLog = result.events[0];
         expect(eventLog.event).to.equal('Transfer');
         const args = eventLog.args;
         expect(args.from).to.equal(deployer.address);
-        expect(args.to).to.equal(person1.address);
+        expect(args.to).to.equal(receiver.address);
         expect(args.value).to.equal(amount);
       });
     });
@@ -67,7 +67,7 @@ describe('Token', () => {
         // Transfer more than the balance of deployer - 100 millions
         const invalidAmount = tokens(100000000);
         await expect(
-          token.connect(deployer).transfer(person1.address, invalidAmount)
+          token.connect(deployer).transfer(receiver.address, invalidAmount)
         ).to.be.revertedWith('Not enough tokens');
       });
       it('rejects invalid recipients', async () => {
@@ -75,6 +75,38 @@ describe('Token', () => {
         await expect(
           token.connect(deployer).transfer(ethers.constants.AddressZero, amount)
         ).to.be.revertedWith('Invalid recipient');
+      });
+    });
+  });
+  describe('Approving Tokens', () => {
+    let amount, transaction, result;
+    beforeEach(async () => {
+      amount = tokens(100);
+      transaction = await token
+        .connect(deployer)
+        .approve(exchange.address, amount);
+      result = await transaction.wait();
+    });
+    describe('Success', () => {
+      it('allocates an allowance for delegated token spending', async () => {
+        expect(
+          await token.allowance(deployer.address, exchange.address)
+        ).to.equal(amount);
+      });
+      it('emits Approval event', async () => {
+        const eventLog = result.events[0];
+        expect(eventLog.event).to.equal('Approval');
+        const args = eventLog.args;
+        expect(args.owner).to.equal(deployer.address);
+        expect(args.spender).to.equal(exchange.address);
+        expect(args.value).to.equal(amount);
+      });
+    });
+    describe('Failure', () => {
+      it('rejects invalid spenders', async () => {
+        await expect(
+          token.connect(deployer).approve(ethers.constants.AddressZero, amount)
+        ).to.be.revertedWith('Invalid spender');
       });
     });
   });
