@@ -8,8 +8,35 @@ contract Exchange {
   address public feeAccount;
   uint256 public feePercent;
   mapping (address => mapping(address => uint256)) public tokens; // token => user => balance
+  mapping (uint256 => _Order) public orders;
+  uint256 public orderCount;
+
+  // Orders Mapping
+  
   event Deposit(address token, address user, uint256 amount, uint256 balance);
   event Withdraw(address token, address user, uint256 amount, uint256 balance);
+  
+  event OrderCreated(
+    uint256 id,
+    address user,
+    address tokenGet,
+    uint256 amountGet,
+    address tokenGive,
+    uint256 amountGive,
+    uint256 timestamp
+  );
+  struct _Order{
+    uint256 id;
+    address user;
+    address tokenGet;
+    uint256 amountGet;
+    address tokenGive;
+    uint256 amountGive;
+    uint256 timestamp; // when the order was created
+  }
+  
+  
+  
   constructor(address _feeAccount, uint256 _feePercent) {
     feeAccount = _feeAccount;
     feePercent = _feePercent;
@@ -43,5 +70,32 @@ contract Exchange {
   // Check balances
   function balanceOf(address _token, address _user) public view returns (uint256){
     return tokens[_token][_user];
+  }
+  
+  // -----------------------------------------
+  // Make and Cancel orders
+  // Token Give (token that user want to spend) - which token, how much
+  // Token Get (token that user want to receive) - which token, how much
+  function makeOrder(
+    address _tokenGet,
+    uint256 _amountGet,
+    address _tokenGive,
+    uint256 _amountGive
+  ) public {
+    require(balanceOf(_tokenGive, msg.sender) >= _amountGive, "Not enough tokens");
+    // create order 
+    orderCount++;
+    orders[orderCount] = _Order(
+      orderCount, // id 
+      msg.sender, // user
+      _tokenGet, // tokenGet
+      _amountGet, // amountGet
+      _tokenGive, // tokenGive
+      _amountGive, // amountGive
+      block.timestamp // timestamp
+    );
+    // emit an event
+    emit OrderCreated(orderCount, msg.sender, _tokenGet, _amountGet, _tokenGive, _amountGive, block.timestamp);
+
   }
 }
