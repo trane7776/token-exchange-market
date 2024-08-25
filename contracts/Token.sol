@@ -8,14 +8,20 @@ contract Token {
     string public symbol;
     uint256 public decimals = 18;
     uint256 public totalSupply;
+    address public owner;
 
-    
     mapping(address => uint256) public balanceOf; // user => balance
     mapping(address => mapping(address => uint256)) public allowance; // owner => spender => amount
     event Transfer(address indexed from, address indexed to, uint256 value);
     event Approval(address indexed owner, address indexed spender, uint256 value);
+    event Mint(address indexed to, uint256 value);
 
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Not the contract owner");
+        _;
+    }
     constructor(string memory _name, string memory _symbol, uint256 _totalSupply) {
+        owner = msg.sender;
         name = _name;
         symbol = _symbol;
         totalSupply = _totalSupply * (10**decimals);
@@ -56,6 +62,14 @@ contract Token {
         allowance[_from][msg.sender] = allowance[_from][msg.sender] - _value;
         //spend tokens
         _transfer(_from, _to, _value);
+        return true;
+    }
+    // mint tokens - only owner can mint - create new tokens for (to) address
+    function mint(address to, uint256 value) public onlyOwner returns (bool success) {
+        totalSupply += value;
+        balanceOf[to] += value;
+        emit Mint(to, value);
+        emit Transfer(address(0), to, value);
         return true;
     }
 }

@@ -160,4 +160,29 @@ describe('Token', () => {
       });
     });
   });
+  describe('Minting Tokens', () => {
+    let amount, transaction, result;
+    beforeEach(async () => {
+      amount = tokens(100);
+      transaction = await token
+        .connect(deployer)
+        .mint(deployer.address, amount);
+      result = await transaction.wait();
+    });
+    it('mints new tokens', async () => {
+      expect(await token.totalSupply()).to.be.equal(tokens(1000100));
+    });
+    it('increments the balance of the recipient', async () => {
+      expect(await token.balanceOf(deployer.address)).to.be.equal(
+        tokens(1000100)
+      );
+    });
+    it('emits Mint event', async () => {
+      const eventLog = result.events[0];
+      expect(eventLog.event).to.equal('Mint');
+      const args = eventLog.args;
+      expect(args.to).to.equal(deployer.address);
+      expect(args.value).to.equal(amount);
+    });
+  });
 });
