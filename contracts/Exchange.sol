@@ -76,6 +76,7 @@ contract Exchange {
     tokens[_token][msg.sender] = tokens[_token][msg.sender] + _amount;
     // Emit an event
     emit Deposit(_token, msg.sender, _amount, tokens[_token][msg.sender]);
+  
   }
   // -----------------------------------------
   // Withdraw tokens
