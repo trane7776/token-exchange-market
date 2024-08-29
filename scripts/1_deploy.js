@@ -12,7 +12,9 @@ async function main() {
   const Token = await ethers.getContractFactory('Token');
   const Exchange = await ethers.getContractFactory('Exchange');
   const accounts = await ethers.getSigners(); // This is required to get the signers - signers are the accounts that will deploy the contracts
-  console.log(`Accounts fetched: ${account[0].address} ${account[1].address}`);
+  console.log(
+    `Accounts fetched: ${accounts[0].address} ${accounts[1].address}`
+  );
 
   const trane = await Token.deploy('Trane Coin', 'TRC', 1000000);
   await trane.deployed();
@@ -26,7 +28,7 @@ async function main() {
   await mDAI.deployed();
   console.log('mDAI Token deployed to:', mDAI.address);
 
-  const exchange = await Exchange.deploy(accounts[1], 10);
+  const exchange = await Exchange.deploy(accounts[1].address, 10);
   await exchange.deployed();
   console.log('Exchange deployed to:', exchange.address);
 }
