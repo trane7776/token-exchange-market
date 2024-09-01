@@ -8,23 +8,33 @@ import {
   loadProvider,
   loadNetwork,
   loadAccount,
-  loadToken,
+  loadTokens,
+  loadExchange,
 } from './store/interactions';
 function App() {
   const dispatch = useDispatch();
 
   const loadBlockchainData = async () => {
-    const account = await loadAccount(dispatch);
-    console.log(account);
-
     // Connect ethers.js to the blockchain
     const provider = loadProvider(dispatch);
+    // Fetch account and balance
+    const account = await loadAccount(provider, dispatch);
+    // Fetch chainId (hardhat: 31337, ropsten: 3, rinkeby: 4, kovan: 42)
     const chainId = await loadNetwork(provider, dispatch);
-    console.log(chainId);
 
     // Token Smart Contract
-    await loadToken(provider, config[chainId].Trane.address, dispatch);
-    await loadToken(provider, config[chainId].mETH.address, dispatch);
+    const Trane = config[chainId].Trane;
+    const mETH = config[chainId].mETH;
+    const mDAI = config[chainId].mDAI;
+    await loadTokens(provider, [Trane.address, mETH.address], dispatch);
+
+    // Load Exchange Smart Contract
+    const exchangeConfig = config[chainId].exchange;
+    const exchange = await loadExchange(
+      provider,
+      exchangeConfig.address,
+      dispatch
+    );
   };
 
   useEffect(() => {
