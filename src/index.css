@@ -155,9 +155,9 @@ small {
   grid-column-end: 6;
 }
 
-.exchange-header-brand h1 {
+/* .exchange-header-brand h1 {
   display: none;
-}
+} */
 
 .exchange-header-networks {
   grid-column-start: 12;

@@ -11,6 +11,7 @@ import {
   loadTokens,
   loadExchange,
 } from './store/interactions';
+import Navbar from './components/Navbar';
 function App() {
   const dispatch = useDispatch();
 
@@ -46,7 +47,7 @@ function App() {
   }, []);
   return (
     <div>
-      {/* Navbar */}
+      <Navbar />
       <main className="exchange grid">
         <section className="exchange-section-left grid">
           {/* Markets */}
