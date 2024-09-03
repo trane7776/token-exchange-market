@@ -109,9 +109,6 @@ async function main() {
   result = await transaction.wait();
   console.log(`Cancelled order: ${orderId} by ${user1.address}`);
 
-  // Wait for 2 second
-  await wait(2);
-
   /////////////////////////////
   // Seed Filled Orders
   //
@@ -129,9 +126,6 @@ async function main() {
   result = await transaction.wait();
   console.log(`Filled order: ${orderId} by ${user2.address}`);
 
-  // Wait for 2 second
-  await wait(2);
-
   // User 1 makes another order
   transaction = await exchange.makeOrder(
     mETH.address,
@@ -148,9 +142,6 @@ async function main() {
   result = await transaction.wait();
   console.log(`Filled order: ${orderId} by ${user2.address}`);
 
-  // Wait for 2 second
-  await wait(2);
-
   // User 1 makes final order
   transaction = await exchange
     .connect(user1)
@@ -164,9 +155,6 @@ async function main() {
   result = await transaction.wait();
   console.log(`Filled order: ${orderId} by ${user2.address}`);
 
-  // wait for 2 seconds
-  await wait(2);
-
   /////////////////////////////
   // Seed Open Orders
   //
@@ -179,8 +167,6 @@ async function main() {
       .makeOrder(mETH.address, tokens(10 * i), Trane.address, tokens(10));
     result = await transaction.wait();
     console.log(`Made order ${i} to get tokens by ${user1.address}`);
-    // Wait for 1 second
-    await wait(1);
   }
 
   // User 2 makes 10 orders
@@ -191,8 +177,6 @@ async function main() {
       .makeOrder(Trane.address, tokens(10), mETH.address, tokens(10 * i));
     result = await transaction.wait();
     console.log(`Made order ${i} to get tokens by ${user2.address}`);
-    // Wait for 1 second
-    await wait(1);
   }
 }
 
