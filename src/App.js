@@ -18,10 +18,18 @@ function App() {
   const loadBlockchainData = async () => {
     // Connect ethers.js to the blockchain
     const provider = loadProvider(dispatch);
-    // Fetch account and balance
-    const account = await loadAccount(provider, dispatch);
+    // Fetch account and balance when changed
+    window.ethereum.on('accountsChanged', async () => {
+      await loadAccount(provider, dispatch);
+    });
+    // const account = await loadAccount(provider, dispatch);
     // Fetch chainId (hardhat: 31337, ropsten: 3, rinkeby: 4, kovan: 42)
     const chainId = await loadNetwork(provider, dispatch);
+
+    // Event to reload network when changed
+    window.ethereum.on('chainChanged', async () => {
+      window.location.reload();
+    });
 
     // Token Smart Contract
     const Trane = config[chainId].Trane;
