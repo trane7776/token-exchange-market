@@ -45,3 +45,31 @@ export const loadExchange = async (provider, address, dispatch) => {
   dispatch({ type: 'EXCHANGE_LOADED', exchange });
   return exchange;
 };
+
+// --------------------------------------------------------------------------------------------
+// LOAD USER BALANCES (WALLET and EXCHANGE BALANCES)
+
+export const loadBalances = async (exchange, tokens, account, dispatch) => {
+  // TOKEN 1
+
+  let balance = ethers.utils.formatUnits(
+    await tokens[0].balanceOf(account),
+    18
+  );
+  dispatch({ type: 'TOKEN_1_BALANCE_LOADED', balance });
+  balance = ethers.utils.formatUnits(
+    await exchange.balanceOf(tokens[0].address, account),
+    18
+  );
+  dispatch({ type: 'EXCHANGE_TOKEN_1_BALANCE_LOADED', balance });
+
+  // TOKEN 2
+
+  balance = ethers.utils.formatUnits(await tokens[1].balanceOf(account), 18);
+  dispatch({ type: 'TOKEN_2_BALANCE_LOADED', balance });
+  balance = ethers.utils.formatUnits(
+    await exchange.balanceOf(tokens[1].address, account),
+    18
+  );
+  dispatch({ type: 'EXCHANGE_TOKEN_2_BALANCE_LOADED', balance });
+};

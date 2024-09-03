@@ -15,6 +15,18 @@
     "explorerURL": "#"
   },
   "11155111": {
-    "explorerURL": "https://sepolia.etherscan.io"
+    "explorerURL": "https://sepolia.etherscan.io",
+    "exchange": {
+      "address": "0"
+    },
+    "Trane": {
+      "address": "0"
+    },
+    "mETH": {
+      "address": "0"
+    },
+    "mDAI": {
+      "address": "0"
+    }
   }
 }
