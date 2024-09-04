@@ -57,7 +57,7 @@ contract Token {
         //check approval
         require(balanceOf[_from] >= _value, "Not enough balance");
         require(allowance[_from][msg.sender] >= _value, "Not enough allowance");
-        
+    // доверенность    
         //update allowance
         allowance[_from][msg.sender] = allowance[_from][msg.sender] - _value;
         //spend tokens

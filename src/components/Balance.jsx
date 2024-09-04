@@ -1,9 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 import dapp from '../assets/dapp.svg';
 import { useSelector, useDispatch } from 'react-redux';
-import { loadBalances } from '../store/interactions';
+import { loadBalances, transferTokens } from '../store/interactions';
 const Balance = () => {
+  const [token1TransferAmount, setToken1TransferAmount] = useState(0);
+
   const dispatch = useDispatch();
   const exchange = useSelector((state) => state.exchange.exchange);
   const tokens = useSelector((state) => state.tokens.contracts);
@@ -11,6 +13,27 @@ const Balance = () => {
   const symbols = useSelector((state) => state.tokens.symbols);
   const tokenBalances = useSelector((state) => state.tokens.balances);
   const exchangeBalances = useSelector((state) => state.exchange.balances);
+  const provider = useSelector((state) => state.provider.connection);
+  const amountHandler = (e, token) => {
+    if (token.address === tokens[0].address) {
+      setToken1TransferAmount(e.target.value);
+    }
+  };
+
+  const depositHandler = (e, token) => {
+    e.preventDefault();
+    if (token.address === tokens[0].address) {
+      transferTokens(
+        provider,
+        exchange,
+        'deposit',
+        token,
+        token1TransferAmount,
+        dispatch
+      );
+    }
+  };
+
   useEffect(() => {
     if (exchange && tokens[0] && tokens[1] && account) {
       loadBalances(exchange, tokens, account, dispatch);
@@ -49,12 +72,17 @@ const Balance = () => {
           </p>
         </div>
 
-        <form>
-          <label htmlFor="token0"></label>
-          <input type="text" id="token0" placeholder="0.0000" />
+        <form onSubmit={(e) => depositHandler(e, tokens[0])}>
+          <label htmlFor="token0">{symbols && symbols[0]} Amount</label>
+          <input
+            type="text"
+            id="token0"
+            placeholder="0.0000"
+            onChange={(e) => amountHandler(e, tokens[0])}
+          />
 
           <button className="button" type="submit">
-            <span></span>
+            <span>Deposit</span>
           </button>
         </form>
       </div>
