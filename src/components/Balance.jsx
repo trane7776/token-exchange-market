@@ -13,12 +13,21 @@ const Balance = () => {
   const symbols = useSelector((state) => state.tokens.symbols);
   const tokenBalances = useSelector((state) => state.tokens.balances);
   const exchangeBalances = useSelector((state) => state.exchange.balances);
+  const transferInProgress = useSelector(
+    (state) => state.exchange.transferInProgress
+  );
   const provider = useSelector((state) => state.provider.connection);
   const amountHandler = (e, token) => {
     if (token.address === tokens[0].address) {
       setToken1TransferAmount(e.target.value);
     }
   };
+
+  // Step 1: Do the transfer
+  // Step 2: Notify app of the transfer
+  // Step 3: Get confirmation from the blockchain
+  // Step 4: Notify app of the confirmation
+  // Step 5: Handle transfer fails - notify app
 
   const depositHandler = (e, token) => {
     e.preventDefault();
@@ -31,6 +40,7 @@ const Balance = () => {
         token1TransferAmount,
         dispatch
       );
+      setToken1TransferAmount(0);
     }
   };
 
@@ -38,7 +48,7 @@ const Balance = () => {
     if (exchange && tokens[0] && tokens[1] && account) {
       loadBalances(exchange, tokens, account, dispatch);
     }
-  }, [exchange, tokens, account, dispatch]);
+  }, [exchange, tokens, account, dispatch, transferInProgress]);
 
   return (
     <div className="component exchange-transfers">
@@ -79,6 +89,7 @@ const Balance = () => {
             id="token0"
             placeholder="0.0000"
             onChange={(e) => amountHandler(e, tokens[0])}
+            value={token1TransferAmount === 0 ? '' : token1TransferAmount}
           />
 
           <button className="button" type="submit">

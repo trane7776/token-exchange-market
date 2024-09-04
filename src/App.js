@@ -10,6 +10,7 @@ import {
   loadAccount,
   loadTokens,
   loadExchange,
+  subscribeToEvents,
 } from './store/interactions';
 import Navbar from './components/Navbar';
 import Markets from './components/Markets';
@@ -46,6 +47,9 @@ function App() {
       exchangeConfig.address,
       dispatch
     );
+
+    // Subscribe to events
+    subscribeToEvents(exchange, dispatch);
   };
 
   useEffect(() => {
