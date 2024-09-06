@@ -1,21 +1,34 @@
 import { useState, useRef } from 'react';
-
+import { makeBuyOrder, makeSellOrder } from '../store/interactions';
+import { useDispatch, useSelector } from 'react-redux';
 const Order = () => {
   const [amount, setAmount] = useState(0);
   const [price, setPrice] = useState(0);
   const [isBuy, setIsBuy] = useState(true);
   const [isSell, setIsSell] = useState(false);
+
+  const dispatch = useDispatch();
+  const provider = useSelector((state) => state.provider.connection);
+  const exchange = useSelector((state) => state.exchange.exchange);
+  const tokens = useSelector((state) => state.tokens.contracts);
+
   const buyRef = useRef(null);
   const sellRef = useRef(null);
 
   const buyHandler = (e) => {
     e.preventDefault();
+    makeBuyOrder(provider, exchange, tokens, { amount, price }, dispatch);
     console.log('Buy', amount, price);
+    setAmount(0);
+    setPrice(0);
   };
 
   const sellHandler = (e) => {
     e.preventDefault();
+    makeSellOrder(provider, exchange, tokens, { amount, price }, dispatch);
     console.log('Sell', amount, price);
+    setAmount(0);
+    setPrice(0);
   };
 
   const tabHandler = (e) => {
@@ -47,6 +60,16 @@ const Order = () => {
       </div>
 
       <form onSubmit={isBuy ? buyHandler : sellHandler}>
+        {isBuy ? (
+          <label htmlFor="amount">
+            <small>Buy</small> Amount
+          </label>
+        ) : (
+          <label htmlFor="amount">
+            <small>Sell</small> Amount
+          </label>
+        )}
+
         <input
           type="text"
           id="amount"
@@ -54,7 +77,15 @@ const Order = () => {
           onChange={(e) => setAmount(e.target.value)}
           value={amount === 0 ? '' : amount}
         />
-
+        {isBuy ? (
+          <label htmlFor="price">
+            <small>Buy</small> Price
+          </label>
+        ) : (
+          <label htmlFor="price">
+            <small>Sell</small> Price
+          </label>
+        )}
         <input
           type="text"
           id="price"
