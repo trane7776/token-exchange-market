@@ -15,6 +15,7 @@ import {
 import Navbar from './components/Navbar';
 import Markets from './components/Markets';
 import Balance from './components/Balance';
+import Order from './components/Order';
 function App() {
   const dispatch = useDispatch();
 
@@ -68,7 +69,7 @@ function App() {
 
           <Balance />
 
-          {/* Order */}
+          <Order />
         </section>
         <section className="exchange-section-right grid">
           {/* PriceChart */}
