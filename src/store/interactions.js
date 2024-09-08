@@ -110,6 +110,30 @@ export const loadBalances = async (exchange, tokens, account, dispatch) => {
 };
 
 // --------------------------------------------------------------------------------------------
+// LOAD ORDERS
+export const loadAllOrders = async (provider, exchange, dispatch) => {
+  const block = await provider.getBlockNumber();
+
+  // Fetch cancelled orders
+  const cancelStream = await exchange.queryFilter('OrderCancelled', 0, block);
+  const cancelledOrders = cancelStream.map((event) => event.args);
+
+  dispatch({ type: 'CANCELLED_ORDERS_LOADED', cancelledOrders });
+
+  // Fetch filled orders
+  const tradeStream = await exchange.queryFilter('Trade', 0, block);
+  const filledOrders = tradeStream.map((event) => event.args);
+
+  dispatch({ type: 'FILLED_ORDERS_LOADED', filledOrders });
+
+  // FETCH ALL ORDERS
+  const orderStream = await exchange.queryFilter('OrderCreated', 0, block);
+  const allOrders = orderStream.map((event) => event.args);
+
+  dispatch({ type: 'ALL_ORDERS_LOADED', allOrders });
+};
+
+// --------------------------------------------------------------------------------------------
 // Transfer Tokens (Deposit/Withdraw)
 
 export const transferTokens = async (
@@ -156,13 +180,13 @@ export const makeBuyOrder = async (
   order,
   dispatch
 ) => {
-  const tokenGet = tokens[0].address;
-  const amountGet = ethers.utils.parseUnits(order.amount, 18);
-  const tokenGive = tokens[1].address;
+  const tokenGet = tokens[0].address; //покупаем трейны
+  const amountGet = ethers.utils.parseUnits(order.amount, 18); //количество трейнов
+  const tokenGive = tokens[1].address; // продаём mETH
   const amountGive = ethers.utils.parseUnits(
     (order.amount * order.price).toString(),
     18
-  );
+  ); // количество mETH для продажи
   dispatch({ type: 'NEW_ORDER_REQUEST' });
   try {
     const signer = provider.getSigner();
@@ -183,13 +207,13 @@ export const makeSellOrder = async (
   order,
   dispatch
 ) => {
-  const tokenGet = tokens[1].address;
+  const tokenGet = tokens[1].address; //покупаем mETH
   const amountGet = ethers.utils.parseUnits(
     (order.amount * order.price).toString(),
     18
-  );
-  const tokenGive = tokens[0].address;
-  const amountGive = ethers.utils.parseUnits(order.amount, 18);
+  ); // количество mETH для покупки
+  const tokenGive = tokens[0].address; // продаём трейны
+  const amountGive = ethers.utils.parseUnits(order.amount, 18); // количество трейнов
   dispatch({ type: 'NEW_ORDER_REQUEST' });
   try {
     const signer = provider.getSigner();
