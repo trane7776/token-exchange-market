@@ -1,6 +1,10 @@
 import React from 'react';
 import { useSelector } from 'react-redux';
+
+import Chart from 'react-apexcharts';
+
 import Banner from './Banner';
+import { options, series } from './PriceChart.config';
 const PriceChart = () => {
   const account = useSelector((state) => state.provider.account);
   const symbols = useSelector((state) => state.tokens.symbols);
@@ -18,7 +22,13 @@ const PriceChart = () => {
       </div>
 
       {account ? (
-        <div>Price Chart Holder</div>
+        <Chart
+          type="candlestick"
+          options={options}
+          series={series}
+          width="100%"
+          height="100%"
+        />
       ) : (
         <Banner text="Please, connect your Metamask Wallet" />
       )}
