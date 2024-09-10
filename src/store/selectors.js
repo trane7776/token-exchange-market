@@ -119,3 +119,28 @@ const decorateOrderBookOrder = (order, tokens) => {
     orderFillAction: orderType === 'buy' ? 'sell' : 'buy',
   };
 };
+
+// -------------------------------------------------------------------------------
+// PRICE CHART
+
+export const priceChartSelector = createSelector(
+  filledOrders,
+  tokens,
+  (orders, tokens) => {
+    if (!tokens[0] || !tokens[1]) return;
+
+    // Filter orders by tokens
+    orders = orders.filter(
+      (order) =>
+        order.tokenGive === tokens[0].address ||
+        order.tokenGive === tokens[1].address
+    );
+    orders = orders.filter(
+      (order) =>
+        order.tokenGet === tokens[0].address ||
+        order.tokenGet === tokens[1].address
+    );
+
+    console.log(orders);
+  }
+);
