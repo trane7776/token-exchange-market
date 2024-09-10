@@ -1,5 +1,5 @@
 import { createSelector } from 'reselect';
-import { get, groupBy, reject } from 'lodash';
+import { get, groupBy, maxBy, reject, minBy } from 'lodash';
 import { ethers } from 'ethers';
 import moment from 'moment';
 
@@ -63,7 +63,6 @@ export const orderBookSelector = createSelector(
   tokens,
   (orders, tokens) => {
     if (!tokens[0] || !tokens[1]) return;
-    console.log(orders);
     // filter orders by tokens 2 times
     orders = orders.filter(
       (order) =>
@@ -96,7 +95,6 @@ export const orderBookSelector = createSelector(
       sellOrders: sellOrders.sort((a, b) => b.tokenPrice - a.tokenPrice),
     };
 
-    console.log(orders);
     return orders;
   }
 );
@@ -141,6 +139,53 @@ export const priceChartSelector = createSelector(
         order.tokenGet === tokens[1].address
     );
 
-    console.log(orders);
+    // sort by timestamp
+    orders = orders.sort((a, b) => a.timestamp - b.timestamp);
+
+    // Decorate orders
+    orders = orders.map((order) => decorateOrder(order, tokens));
+
+    // get price for up and down arrows
+    const lastOrder = orders[orders.length - 1];
+    const previousOrder = orders[orders.length - 2] || lastOrder;
+
+    const lastPrice = get(lastOrder, 'tokenPrice', 0);
+    const previousPrice = get(previousOrder, 'tokenPrice', 0);
+    return {
+      lastPrice,
+      lastPriceChange: lastPrice >= previousPrice ? GREEN : RED,
+      series: [
+        {
+          data: buildGraphData(orders),
+        },
+      ],
+    };
   }
 );
+
+const buildGraphData = (orders) => {
+  // Group orders by hour
+  orders = groupBy(orders, (o) =>
+    moment.unix(o.timestamp).startOf('hour').format()
+  );
+
+  // Get each hour where orders were placed
+  const hours = Object.keys(orders);
+  // Build the graph data
+  const graphData = hours.map((hour) => {
+    // Fetch all orders for the hour
+    const group = orders[hour];
+    // Calculate open, high, low, close prices
+
+    const open = group[0]; // first order
+    const high = maxBy(group, 'tokenPrice'); // highest price
+    const low = minBy(group, 'tokenPrice'); // lowest price
+    const close = group[group.length - 1]; // last order
+
+    return {
+      x: new Date(hour),
+      y: [open.tokenPrice, high.tokenPrice, low.tokenPrice, close.tokenPrice],
+    };
+  });
+  return graphData;
+};
