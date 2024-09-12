@@ -56,6 +56,70 @@ const decorateOrder = (order, tokens) => {
 };
 
 // -------------------------------------------------------------------------------
+// ALL FILLED ORDERS
+
+export const filledOrdersSelector = createSelector(
+  filledOrders,
+  tokens,
+  (orders, tokens) => {
+    if (!tokens[0] || !tokens[1]) return;
+    // filter orders by tokens 2 times
+    orders = orders.filter(
+      (order) =>
+        order.tokenGet === tokens[0].address ||
+        order.tokenGive === tokens[0].address
+    );
+    orders = orders.filter(
+      (order) =>
+        order.tokenGet === tokens[1].address ||
+        order.tokenGive === tokens[1].address
+    );
+    // 1: sort orders by timestamp ascending
+    // 2: decorate orders
+    // 3: sord orders by timestamp descending
+    orders = orders.sort((a, b) => a.timestamp - b.timestamp);
+
+    // decorate orders
+    orders = decorateFilledOrders(orders, tokens);
+
+    // sort orders by timestamp descending
+    return orders.sort((a, b) => b.timestamp - a.timestamp);
+  }
+);
+
+const decorateFilledOrders = (orders, tokens) => {
+  // track previous order to compare prices
+  let previousOrder = orders[0];
+
+  return orders.map((order) => {
+    // decorate each order
+    order = decorateOrder(order, tokens);
+    order = decorateFilledOrder(order, previousOrder);
+    previousOrder = order; // update previous order
+    return order;
+  });
+};
+
+const decorateFilledOrder = (order, previousOrder) => {
+  return {
+    ...order,
+    tokenPriceClass: tokenPriceClass(order.tokenPrice, order.id, previousOrder),
+  };
+};
+
+const tokenPriceClass = (tokenPrice, orderId, previousOrder) => {
+  if (previousOrder.id === orderId) {
+    return GREEN;
+  }
+  if (previousOrder.tokenPrice <= tokenPrice) {
+    // show green price if order price higher than previous order price
+    return GREEN;
+  } else {
+    return RED;
+  }
+};
+
+// -------------------------------------------------------------------------------
 // ORDER BOOK
 
 export const orderBookSelector = createSelector(
@@ -153,7 +217,7 @@ export const priceChartSelector = createSelector(
     const previousPrice = get(previousOrder, 'tokenPrice', 0);
     return {
       lastPrice,
-      lastPriceChange: lastPrice >= previousPrice ? GREEN : RED,
+      lastPriceChange: lastPrice >= previousPrice ? 'up' : 'down',
       series: [
         {
           data: buildGraphData(orders),

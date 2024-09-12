@@ -22,7 +22,7 @@ const PriceChart = () => {
           <h2>{symbols && `${symbols[0]}/${symbols[1]}`}</h2>
           {priceChart && (
             <div className="flex">
-              {priceChart.lastPriceChange === 'GREEN' ? (
+              {priceChart.lastPriceChange === 'up' ? (
                 <img src={arrowUp} alt="Arrow up" />
               ) : (
                 <img src={arrowDown} alt="Arrow down" />
