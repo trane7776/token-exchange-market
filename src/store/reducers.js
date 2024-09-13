@@ -1,3 +1,5 @@
+import { isError } from 'lodash';
+
 export const provider = (state = {}, action) => {
   switch (action.type) {
     case 'PROVIDER_LOADED':
@@ -111,6 +113,44 @@ export const exchange = (state = DEFAULT_EXCHANGE_STATE, action) => {
         allOrders: {
           loaded: true,
           data: action.allOrders,
+        },
+      };
+
+    // ------------------------------------------------------------------------------
+    // CANCELLING ORDERS
+    case 'ORDER_CANCEL_REQUEST':
+      return {
+        ...state,
+        transaction: {
+          transactionType: 'Cancel',
+          isPending: true,
+          isSuccessful: false,
+        },
+      };
+
+    case 'ORDER_CANCEL_SUCCESS':
+      return {
+        ...state,
+        transaction: {
+          transactionType: 'Cancel',
+          isPending: false,
+          isSuccessful: true,
+        },
+        cancelledOrders: {
+          ...state.cancelledOrders,
+          data: [...state.cancelledOrders.data, action.order],
+        },
+        events: [action.event, ...state.events],
+      };
+
+    case 'ORDER_CANCEL_FAILED':
+      return {
+        ...state,
+        transaction: {
+          transactionType: 'Cancel',
+          isPending: false,
+          isSuccessful: false,
+          isError: true,
         },
       };
 
