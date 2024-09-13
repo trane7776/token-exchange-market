@@ -16,6 +16,7 @@ const Balance = () => {
   const symbols = useSelector((state) => state.tokens.symbols);
   const tokenBalances = useSelector((state) => state.tokens.balances);
   const exchangeBalances = useSelector((state) => state.exchange.balances);
+  const filledOrders = useSelector((state) => state.exchange.filledOrders);
   const transferInProgress = useSelector(
     (state) => state.exchange.transferInProgress
   );
@@ -104,7 +105,7 @@ const Balance = () => {
     if (exchange && tokens[0] && tokens[1] && account) {
       loadBalances(exchange, tokens, account, dispatch);
     }
-  }, [exchange, tokens, account, dispatch, transferInProgress]);
+  }, [exchange, tokens, account, dispatch, transferInProgress, filledOrders]);
 
   return (
     <div className="component exchange-transfers">
