@@ -202,6 +202,7 @@ export const transferTokens = async (
     }
   } catch (error) {
     dispatch({ type: 'TRANSFER_FAILED' });
+    console.log(error);
   }
 };
 

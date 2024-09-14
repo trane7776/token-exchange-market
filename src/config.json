@@ -28,5 +28,20 @@
     "mDAI": {
       "address": "0x55989A935Ce681BE1Cb383836c2402dE10a963ad"
     }
+  },
+  "80002": {
+    "explorerURL": "https://amoy.polygonscan.com",
+    "exchange": {
+      "address": "0x4D2Ff8CCEc09c83756b8EDB8A67aE4Cc834476E9"
+    },
+    "Trane": {
+      "address": "0x2Ee106DEDa6AfA3B73460cd8bFEe3EcaaEb94676"
+    },
+    "mETH": {
+      "address": "0x62E1d5644784d8d13A51E02821aC094af9C17bBD"
+    },
+    "mDAI": {
+      "address": "0x2D2E3F3dFa744CcD7c53ED562E39321E227cc006"
+    }
   }
 }

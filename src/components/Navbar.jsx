@@ -44,6 +44,7 @@ const Navbar = () => {
             </option>
             <option value="31337">Localhost</option>
             <option value="11155111">Sepolia</option>
+            <option value="80002">Poligon Amoy</option>
           </select>
         )}
       </div>

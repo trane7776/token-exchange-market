@@ -159,9 +159,9 @@ async function main() {
   // Seed Open Orders
   //
 
-  // User 1 makes 10 orders
+  // User 1 makes 3 orders
 
-  for (let i = 1; i <= 10; i++) {
+  for (let i = 1; i <= 3; i++) {
     transaction = await exchange
       .connect(user1)
       .makeOrder(mETH.address, tokens(10 * i), Trane.address, tokens(10));
@@ -169,9 +169,9 @@ async function main() {
     console.log(`Made order ${i} to get tokens by ${user1.address}`);
   }
 
-  // User 2 makes 10 orders
+  // User 2 makes 3 orders
 
-  for (let i = 1; i <= 10; i++) {
+  for (let i = 1; i <= 3; i++) {
     transaction = await exchange
       .connect(user2)
       .makeOrder(Trane.address, tokens(10), mETH.address, tokens(10 * i));
