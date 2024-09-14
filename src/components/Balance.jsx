@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from 'react';
 
-import dapp from '../assets/dapp.svg';
+import dapp from '../assets/logo.svg';
 import eth from '../assets/eth.svg';
 import { useSelector, useDispatch } from 'react-redux';
 import { loadBalances, transferTokens } from '../store/interactions';
